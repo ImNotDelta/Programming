@@ -31,6 +31,19 @@ for (let index = 0; index < people.length; index++) {
 */
 console.log("Task: A");
 
+function drawTree(height) {
+    for (let i = 1; i <= height; i++) {
+        let stars = '*'.repeat(2 * i - 1);
+        let spaces = '  '.repeat(height - 1);
+        console.log(spaces + stars);
+    }
+    let trunkSpaces = ' '.repeat(height - 1);
+    console.log(trunkSpaces + 'x');
+}
+
+drawTree(4);
+
+
 /* -----------------------------------------------------------------------------
     Task: B
 
@@ -45,6 +58,17 @@ console.log("Task: A");
 */
 console.log("Task: B");
 
+
+function drawArrow(size) {
+    for (let i = 1; i <= size; i++) {
+        console.log('* '.repeat(i).trim());
+    }
+    for (let i = size - 1; i > 0; i--) {
+        console.log('* '.repeat(i).trim());
+    }
+}
+
+drawArrow(3)
 /* -----------------------------------------------------------------------------
     Task: C
     Write a function that draws a box of n by m dimensions. Take into acount the diffrence in aspectratio.
@@ -57,7 +81,18 @@ console.log("Task: B");
 */
 console.log("Task: C");
 
+function drawBox(n, m) {
+    let topBottom = '+' + '-'.repeat(m - 2) + 'x';
+    let middle = '|' + ' '.repeat(m - 2) + '|';
 
+    console.log(topBottom);
+    for (let i = 0; i < n - 2; i++) {
+        console.log(middle);
+    }
+    console.log(topBottom);
+}
+
+drawBox(4, 10);
 
 /* -----------------------------------------------------------------------------
     Task: D
@@ -65,10 +100,40 @@ console.log("Task: C");
 */
 console.log("Task: D");
 
+function isHeterogram(word) {
+    let letterSet = new Set();
+    word = word.toLoweCase().replace(/[^a-z]/g, '');
 
+    for (let i = 0; i < word.length; i++) {
+        if (letterSet.has(word(i))){
+            return false;
+        }
+        letterSet.add(word[i]);
+    }
+    return true;
+}
+
+console.log(isHeterogram("Table"))
+console.log(isHeterogram("Chair"))
 
 /* -----------------------------------------------------------------------------
     Task: E
     Write a function that returns true if two words are Anagrams.
 */
 console.log("Task: E");
+
+function areAnagrams(word1, word2) {
+    word1 = word1.toLoweCase().replace(/[^a-z]/g, '');
+    word2 = word2.toLoweCase().replace(/[^a-z]/g, '');
+
+    if (word1.length !== word2.length) {
+        return false;
+    }
+    let sortedWord1 = word1.split('').sort().join('');
+    let sortedWord2 = word1.split('').sort().join('');
+
+    return sortedWord1 === sortedWord2;
+}
+
+console.log(areAnagrams("University", "Chocolate"));
+console.log(areAnagrams("Train", "Snow"));
