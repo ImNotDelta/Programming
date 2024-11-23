@@ -109,7 +109,7 @@ function buildMainMenu() {
                     return p1map;
 
                 }, 3);
-                currentState.next = inbetween;
+                currentState.next = inBetween;
                 currentState.transitionTo = "Map layout";
             }
         },
