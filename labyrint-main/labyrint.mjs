@@ -296,8 +296,21 @@ class Labyrinth {
 
             // Make the draw function draw.
             isDirty = true;
-        } else {
-            direction *= -1;
+        } else if (targetCell === "X") {
+            const npc = this.npcs.find(n => n.row === tRow && n.col === tCol);
+            if (npc) {
+                this.handleBattle(npc)
+            }
+        } else if (targetCell == "D" || targetCell === "d") {
+            this.lastDoorSymbol = targetCell;
+            const currentRoom = this.levelID;
+            const doorMapping = DOOR_MAPPINGS[currentRoom][targetCell];
+
+            if (doorMapping) {
+                this.lastDoorSymbol = targetCell;
+                this.loadLevel(doorMapping.targetRoom, doorMapping.targetDoor);
+                isDirty = true;
+            }
         }
     }
 
