@@ -3,18 +3,9 @@ import KeyBoardManager from "./utils/KeyBoardManager.mjs";
 import { readMapFile, readRecordFile } from "./utils/fileHelpers.mjs";
 import * as CONST from "./constants.mjs";
 
-const HP_MAX = 10;
-const EMPTY = " ";
-const HERO = "H";
-const LOOT = "$"
+
 const startingLevel = CONST.START_LEVEL_ID;
 const levels = loadLevelListings();
-const levelHistory = [];
-const DOOR_MAPPINGS = {
-    "start": {"D": { targetRoom: "aSharpPlace", targetDoor: "D" }},
-    "aSharpPlace":{"D": { targetRoom: "start", targetDoor: "D" }, "d": { targetRoom: "thirdRoom", targetDoor: "d"}},
-    "thirdRoom":{"d": { targetRoom: "thirdRoom", targetDoor: "d" }}
-}
 
 function loadLevelListings(source = CONST.LEVEL_LISTING_FILE) {
     let data = readRecordFile(source);
@@ -48,6 +39,10 @@ let playerPos = {
     col: null,
 }
 
+const EMPTY = " ";
+const HERO = "H";
+const LOOT = "$"
+
 let direction = -1;
 
 let items = [];
@@ -56,62 +51,31 @@ const THINGS = [LOOT, EMPTY];
 
 let eventText = "";
 
+const HP_MAX = 10;
+
 const playerStats = {
     hp: 8,
     cash: 0
 }
 
 class Labyrinth {
-    constructor() {
-        this.loadLevel(startingLevel);
-    }
 
-    loadLevel(levelID, fromDoor = null) {
+    update() {
 
-        if (this.levelID) {
-            const currentDoor = this.level[playerPos.row][playerPos.col];
-            this.level[playerPos.row][playerPos.col] = currentDoor;
-            levelHistory.push({
-                LevelID: this.levelID,
-                playerPos: { ...playerPos },
-                lastDoor: currentDoor
-            });
-        }
-
-        this.levelID = levelID;
-        this.level = readMapFile(levels[levelID]);
-        
-        if (fromDoor) {
-            const doorLocation = this.findSymbol(fromDoor);
-            if (doorLocation) {
-                this.level[doorLocation.row][doorLocation] = HERO;
-                playerPos.row = doorLocation.row;
-                playerPos.col = doorLocation.col;
-            }
-        } else if (levelID = "start") {
-            const startingRow = 5;
-            const startingCol = 4;
-            this.level[startingRow][startingCol] = HERO;
-            playerPos.row = startingRow;
-            playerPos.col = startingCol;
-        } else {
-            playerPos.row = null;
-            playerPos.col = null;
-        }
-        isDirty = true;
-    } 
-
-    findSymbol(symbol) {
-        for (let row = 0; row < this.level.length; row++) {
-            for (let col = 0; col < this.level[row].length; col++) {
-                if (this.level[row][col] === symbol) {
-                    return { row, col };
+        if (playerPos.row == null) {
+            for (let row = 0; row < level.length; row++) {
+                for (let col = 0; col < level[row].length; col++) {
+                    if (level[row][col] == "H") {
+                        playerPos.row = row;
+                        playerPos.col = col;
+                        break;
+                    }
+                }
+                if (playerPos.row != undefined) {
+                    break;
                 }
             }
         }
-    }
-
-    update() {
 
         let dRow = 0;
         let dCol = 0;
@@ -128,12 +92,8 @@ class Labyrinth {
             dCol = 1;
         }
 
-        let tRow = playerPos.row + dRow;
-        let tCol = playerPos.col + dCol;
-
-        if(tRow < 0 || tCol < 0 || tRow >= this.level.length || tCol >= this.level[0].length) return;
-
-        const targetCell = this.level[tRow][tCol];
+        let tRow = playerPos.row + (1 * dRow);
+        let tCol = playerPos.col + (1 * dCol);
 
         if (THINGS.includes(level[tRow][tCol])) { // Is there anything where Hero is moving to
 
@@ -144,12 +104,11 @@ class Labyrinth {
                 eventText = `Player gained ${loot}$`;
             }
 
-            // Restore Door
-
+            // Move the HERO
             level[playerPos.row][playerPos.col] = EMPTY;
+            level[tRow][tCol] = HERO;
 
             // Update the HERO
-            level[tRow][tCol] = HERO;
             playerPos.row = tRow;
             playerPos.col = tCol;
 
