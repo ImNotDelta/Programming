@@ -109,6 +109,42 @@ class Labyrinth {
             this.combatLog.shift();
         }
     }
+
+    addProjectile(row, col, draw, dCol) {
+        this.projectiles.push({ row, col, draw, dCol });
+    }
+
+    updateProjectiles() {
+        const newProjectiles = [];
+
+        this.projectiles.forEach((projectile) => {
+            const newRow = projectile.row + projectile.dRow;
+            const newCol = projectile.col + projectile.dCol;
+
+            if (
+                nextRow < 0 || nextCol < 0 ||
+                nextRow >= this.level.length || nextCol >= this.level[0].length ||
+                this.level[nextRow][nextCol] === "█"
+            ) {
+                return;
+            }
+
+            if (nextRow === playerPos.row && nextCol === playerPos.col) {
+                const damage = 2;
+                playerStats.hp -= damage;
+                this.addCombatLog(`Projectile hits player! Took ${damage} Damage`);
+                if (playerStats <= 0) {
+                    this.addCombatLog("Player defeated! Game Over!");
+                    this.stopGame();
+                }      
+            }   
+
+            this.level[projectile.row][projectile.col] = EMPTY;
+            this.level[nextRow][nextCol] = "*";
+            newProjectiles.push({ ...projectile, row: nextRow, col: nextCol});
+        });
+    }
+
     update() {
 
         if (playerPos.row == null) {
