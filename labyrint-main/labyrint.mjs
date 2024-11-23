@@ -158,6 +158,23 @@ class Labyrinth {
 
         this.levelID = levelID;
         this.level = readMapFile(levels[levelID]);
+
+        this.npcs = [];
+        for (let row = 0; row < this.level.length; row++) {
+            for (let col = 0; col < this.level[row].length; col++) {
+                if (this.level[row][col] === "X") {
+                    this.npcs.push({
+                        row,
+                        col,
+                        direction: 1,
+                        strength: Math.floor(Math.random() * 5) +1,
+                        hitpoints: Math.floor(Math.random() * 10) + 5
+                    });
+                }
+            }
+        }
+
+        
     }
 
     update() {
