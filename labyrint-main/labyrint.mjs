@@ -3,6 +3,7 @@ import KeyBoardManager from "./utils/KeyBoardManager.mjs";
 import { readMapFile, readRecordFile } from "./utils/fileHelpers.mjs";
 import * as CONST from "./constants.mjs";
 import { start } from "repl";
+import { emit } from "process";
 
 const EMPTY = " ";
 const HERO = "H";
@@ -205,6 +206,25 @@ class Labyrinth {
         }
         return null;
     }
+
+    returnToPreviousLevel() {
+        if (levelHistory.length === 0) return;
+
+        const { levelID, playerPos: savedPos, LastDoor } = levelHistory.pop();
+        
+        this.levelID = levelID
+        this.level = readMapFile(level[levelID]);
+
+        this.level[savedPos.row][savedPos.col] = HERO;
+        playerPos.row = savedPos.row;
+        playerPos.col = savedPos.col;
+
+        const currentDoor = this.lastDoorSymbol || EMPTY;
+        this.level[playerPos.row][playerPos.col] = currentDoor;
+        isDirty = true;
+    }
+
+    
 
     update() {
 
