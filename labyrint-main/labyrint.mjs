@@ -331,9 +331,9 @@ class Labyrinth {
             ) {
                 this.npc.direction *= -1;
             } else {
-                this.level[npc.row][npc.col] !== EMPTY;
+                this.level[npc.row][npc.col] = EMPTY;
                 npc.col += npc.direction;
-                this.level[npc.row][npc.col] !== "X";
+                this.level[npc.row][npc.col] = "X";
             }
         });
         isDirty = true;
