@@ -103,7 +103,12 @@ class Labyrinth {
         this.levelID = null;
         this.loadLevel(startingLevel);
     }
-    
+    addCombatLog(message) {
+        this.combatLog.push(message);
+        if (this.combatLog.length > 5) {
+            this.combatLog.shift();
+        }
+    }
     update() {
 
         if (playerPos.row == null) {
