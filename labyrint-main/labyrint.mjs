@@ -2,6 +2,7 @@ import ANSI from "./utils/ANSI.mjs";
 import KeyBoardManager from "./utils/KeyBoardManager.mjs";
 import { readMapFile, readRecordFile } from "./utils/fileHelpers.mjs";
 import * as CONST from "./constants.mjs";
+import { start } from "repl";
 
 const EMPTY = " ";
 const HERO = "H";
@@ -174,7 +175,24 @@ class Labyrinth {
             }
         }
 
-        
+        if (fromDoor) {
+            const doorLocation = this.findSymbol(fromDoor);
+            if (doorLocation) {
+                this.level[doorLocation.row][doorLocation.col] = HERO;
+                playerPos.row = doorLocation.row;
+                playerPos.col = doorLocation.col;
+            }
+        } else if (levelID = "start") {
+            const startingRow = 5;
+            const startingCol = 4;
+            this.level[startingRow][startingCol] = HERO;
+            playerPos.row = startingRow;
+            playerPos.col = startingCol;
+        } else {
+            playerPos.row = null;
+            playerPos.col = null;
+        }
+        isDirty = true;
     }
 
     update() {
