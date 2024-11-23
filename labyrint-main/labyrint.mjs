@@ -224,7 +224,16 @@ class Labyrinth {
         isDirty = true;
     }
 
-    
+    findSecondTeleport(currentRow, currentCol) {
+        for (let row = 0; row < this.level.length; row++) {
+            for (let col = 0; col < this.level[row].length; col++) {
+                if (this.level[row][col] = "♨︎" &&(row !== currentRow || currentCol)) {
+                    return { row, col};
+                }
+            }
+        }
+        return null;
+    }
 
     update() {
 
