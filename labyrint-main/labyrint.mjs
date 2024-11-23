@@ -279,9 +279,15 @@ class Labyrinth {
                 const message = PICKUPS[targetCell].effect(playerStats);
                 this.addCombatLog(message);
             }
+
+            if (this.level[playerPos.row][playerPos.col] === HERO && this.lastDoorSymbol) {
+                this.level[playerPos.row][playerPos.col] = this.lastDoorSymbol;
+                this.lastDoorSymbol = null;
+            } else {
+                this.level[playerPos.row][playerPos.col] = EMPTY;
+            }
            
             // Move the HERO
-            level[playerPos.row][playerPos.col] = EMPTY;
             level[tRow][tCol] = HERO;
 
             // Update the HERO
