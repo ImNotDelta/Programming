@@ -3,9 +3,27 @@ import KeyBoardManager from "./utils/KeyBoardManager.mjs";
 import { readMapFile, readRecordFile } from "./utils/fileHelpers.mjs";
 import * as CONST from "./constants.mjs";
 
+const EMPTY = " ";
+const HERO = "H";
+const LOOT = "$"
+const MYSTERY = "p";
 
 const startingLevel = CONST.START_LEVEL_ID;
 const levels = loadLevelListings();
+const levelHistory = [];
+const DOOR_MAPPINGS = {
+    "start": {
+        "D": { targetRoom: "aSharpPlace", targetDoor: "D"}
+    },
+    "aSharpPlace": {
+        "D": { targetRoom: "start", targetDoor: "D" },
+        "d": { targetRoom: "thirdRoom", targetDoor: "d" }
+    },
+    "thirdRoom": {
+        "d": { targetRoom: "aSharpPlace", targetDoor: "d" }
+    }
+};
+
 
 function loadLevelListings(source = CONST.LEVEL_LISTING_FILE) {
     let data = readRecordFile(source);
@@ -21,8 +39,7 @@ function loadLevelListings(source = CONST.LEVEL_LISTING_FILE) {
     return levels;
 }
 
-let levelData = readMapFile(levels[startingLevel]);
-let level = levelData;
+const THINGS = [LOOT, EMPTY];
 
 let pallet = {
     "█": ANSI.COLOR.LIGHT_GRAY,
@@ -39,15 +56,9 @@ let playerPos = {
     col: null,
 }
 
-const EMPTY = " ";
-const HERO = "H";
-const LOOT = "$"
-
 let direction = -1;
 
 let items = [];
-
-const THINGS = [LOOT, EMPTY];
 
 let eventText = "";
 
