@@ -42,7 +42,7 @@ function loadLevelListings(source = CONST.LEVEL_LISTING_FILE) {
 }
 
 const THINGS = [LOOT, EMPTY, MYSTERY];
-const PICKUPs = {
+const PICKUPS = {
     P: {
         name: "Mystery Item",
         effect: (playerStats) => {
@@ -267,11 +267,18 @@ class Labyrinth {
             dCol = 1;
         }
 
-        let tRow = playerPos.row + (1 * dRow);
-        let tCol = playerPos.col + (1 * dCol);
+        let tRow = playerPos.row +  dRow;
+        let tCol = playerPos.col +  dCol;   
 
-        if (THINGS.includes(level[tRow][tCol])) { // Is there anything where Hero is moving to
+        if(tRow < 0 || tCol < 0 || tRow >= this.level.length || tCol >= this.level[0].length) return;
 
+        const targetCell = this.level[tRow][tCol];
+
+        if (THINGS.include(targetCell)) { // Is there anything where Hero is moving to
+            if (PICKUPS[targetCell]) {
+                const message = PICKUPS[targetCell].effect(playerStats);
+                this.addCombatLog(message);
+            }
            
             // Move the HERO
             level[playerPos.row][playerPos.col] = EMPTY;
