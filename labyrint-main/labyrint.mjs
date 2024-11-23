@@ -288,7 +288,7 @@ class Labyrinth {
             }
            
             // Move the HERO
-            level[tRow][tCol] = HERO;
+            this.level[tRow][tCol] = HERO;
 
             // Update the HERO
             playerPos.row = tRow;
@@ -353,10 +353,10 @@ class Labyrinth {
 
         rendering += renderHud();
 
-        for (let row = 0; row < level.length; row++) {
+        for (let row = 0; row < this.level.length; row++) {
             let rowRendering = "";
             for (let col = 0; col < level[row].length; col++) {
-                let symbol = level[row][col];
+                let symbol = this.level[row][col];
                 if (pallet[symbol] != undefined) {
                     rowRendering += pallet[symbol] + symbol + ANSI.COLOR_RESET;
                 } else {
@@ -367,13 +367,38 @@ class Labyrinth {
             rendering += rowRendering;
         }
 
+        rendering += "\n Combat log: \n";
+        this.combatLog.forEach(log => {
+            rendering += `${log}\n`;
+        });
         console.log(rendering);
-        if (eventText != "") {
-            console.log(eventText);
-            eventText = "";
+        }
+
+        handleBattle(npc) {
+
+            const playerDamage = npc.strength;
+            const npcDamage = playerStats.strength;
+
+            playerStats.hp -= playerDamage;
+            npc.hitpoints -= npcDamage;
+
+            this.addCombatLog(`Battle! Player takes ${playerDamage} damage!`);
+            this.addCombatLog(`Npc takes ${npcDamage} damage`);
+
+            if (npc.hitpoints <= 0) {
+                this.addCombatLog("Npc defeated!");
+                this.level[npc.row][npc.col] = EMPTY;
+                this.npcs = this.npcs.filter(n => n !== npc);
+            }
+
+            if (playerStats.hp <= 0) {
+                this.addCombatLog("Player defeated! Game Over!");
+                this.stopGame();
+            }
+            isDirty = true;
         }
     }
-}
+
 
 function renderHud() {
     let hpBar = `Life:[${ANSI.COLOR.RED + pad(playerStats.hp, "♥︎") + ANSI.COLOR_RESET}${ANSI.COLOR.LIGHT_GRAY + pad(HP_MAX - playerStats.hp, "♥︎") + ANSI.COLOR_RESET}]`
