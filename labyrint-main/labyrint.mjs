@@ -3,7 +3,7 @@ import KeyBoardManager from "./utils/KeyBoardManager.mjs";
 import { readMapFile, readRecordFile } from "./utils/fileHelpers.mjs";
 import * as CONST from "./constants.mjs";
 import { start } from "repl";
-import { emit } from "process";
+import { emit, execPath } from "process";
 
 const EMPTY = " ";
 const HERO = "H";
@@ -312,6 +312,32 @@ class Labyrinth {
                 isDirty = true;
             }
         }
+        this.npcs.forEach((npc) => {
+            if (npc.type === "B") {
+                const heroDistance = Math.abs(npc.row - playerPos.row) + Math.abs(npc.col - playerPos.col);
+                if (heroDistance >= 5) {
+                    let dRow = Math.sign(playerPos.row - npc.row);
+                    let dCol = Mat.sign(playerPos.col - npc.col);
+
+                    this.addProjectile(npc.row, npc.col, draw, dCol);
+                }
+            }
+            let nextCol = npc.col + npc.direction;
+
+            if(
+                nextCol < 0 ||
+                nextCol >= this.level[0].length ||
+                this.level[npc.row][nextCol] !== EMPTY
+            ) {
+                this.npc.direction *= -1;
+            } else {
+                this.level[npc.row][npc.col] !== EMPTY;
+                npc.col += npc.direction;
+                this.level[npc.row][npc.col] !== "X";
+            }
+        });
+        isDirty = true;
+        this.updateProjectiles();
     }
 
     draw() {
