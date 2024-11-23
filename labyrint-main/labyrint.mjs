@@ -39,13 +39,40 @@ function loadLevelListings(source = CONST.LEVEL_LISTING_FILE) {
     return levels;
 }
 
-const THINGS = [LOOT, EMPTY];
+const THINGS = [LOOT, EMPTY, MYSTERY];
+const PICKUPs = {
+    P: {
+        name: "Mystery Item",
+        effect: (playerStats) => {
+            const isPotion = Math.random() < 0.5;
+            if (isPotion) {
+                const restoreHP = 5;
+                playerStats.hp = Math.min(playerStats.hp + restoreHP, HP_MAX);
+                return `Picked up a Mystery Item! It was a Health Potion. Restored ${restoreHP} HP`;
+            } else {
+                const damage = 3; 
+                playerStats.hp = Math.max(playerStats - damage, 0);
+                return `Picked up a Mystery Item! It was a Poison Potion. Lost ${damage} HP`;
+            }
+        }
+    },
+    $: {
+        name: "Money",
+        effect: (playerStats) => {
+            const amount = math.round(Math.random() * 7) + 3;
+            playerStats.cash += amount;
+            eventText = `Player Gained ${amount}$`;
+        }
+    }
+};
 
 let pallet = {
     "█": ANSI.COLOR.LIGHT_GRAY,
     "H": ANSI.COLOR.RED,
     "$": ANSI.COLOR.YELLOW,
-    "B": ANSI.COLOR.GREEN,
+    "B": ANSI.COLOR.BLUE,
+    "P": ANSI.COLOR.GREEN,
+    "*": ANSI.COLOR.WHITE,
 }
 
 
@@ -56,21 +83,27 @@ let playerPos = {
     col: null,
 }
 
-let direction = -1;
-
-let items = [];
-
 let eventText = "";
 
-const HP_MAX = 10;
-
+const HP_MAX = 20;
 const playerStats = {
-    hp: 8,
+    hp: 20,
+    strength: 4,
     cash: 0
 }
 
 class Labyrinth {
-
+    constructor(stopGameCallBack) {
+        this.stopGame = stopGameCallBack;
+        this.npc = [];
+        this.projectiles = [];
+        this.combatLog = [];
+        this.lastDoorSymbol = null;
+        this.level = [];
+        this.levelID = null;
+        this.loadLevel(startingLevel);
+    }
+    
     update() {
 
         if (playerPos.row == null) {
@@ -108,13 +141,7 @@ class Labyrinth {
 
         if (THINGS.includes(level[tRow][tCol])) { // Is there anything where Hero is moving to
 
-            let currentItem = level[tRow][tCol];
-            if (currentItem == LOOT) {
-                let loot = Math.round(Math.random() * 7) + 3;
-                playerStats.cash += loot;
-                eventText = `Player gained ${loot}$`;
-            }
-
+           
             // Move the HERO
             level[playerPos.row][playerPos.col] = EMPTY;
             level[tRow][tCol] = HERO;
