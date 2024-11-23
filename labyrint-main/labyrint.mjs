@@ -145,6 +145,21 @@ class Labyrinth {
         });
     }
 
+    loadLevel(levelID, fromDoor = null) {
+        if (this.levelID) {
+            const currentDoor = this.level[playerPos.row][playerPos.col];
+            this.level[playerPos.row][playerPos.col] = currentDoor;
+            levelHistory.push({
+                levelID: this.levelID,
+                playerPos: { ...playerPos},
+                lastDoor: currentDoor
+            });
+        }
+
+        this.levelID = levelID;
+        this.level = readMapFile(levels[levelID]);
+    }
+
     update() {
 
         if (playerPos.row == null) {
