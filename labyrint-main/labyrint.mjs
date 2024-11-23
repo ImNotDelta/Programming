@@ -195,6 +195,17 @@ class Labyrinth {
         isDirty = true;
     }
 
+    findSymbol(symbol) {
+        for (let row = 0; row < this.level.length; row++) {
+            for (let col = 0; col < this.level[row].length; col++) {
+                if (this.level[row][col] === symbol) {
+                    return { row, col};
+                }
+            }
+        }
+        return null;
+    }
+
     update() {
 
         if (playerPos.row == null) {
