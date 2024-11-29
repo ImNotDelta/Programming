@@ -2,8 +2,6 @@ import ANSI from "./utils/ANSI.mjs";
 import KeyBoardManager from "./utils/KeyBoardManager.mjs";
 import { readMapFile, readRecordFile } from "./utils/fileHelpers.mjs";
 import * as CONST from "./constants.mjs";
-import { start } from "repl";
-import { emit, execPath } from "process";
 
 const EMPTY = " ";
 const HERO = "H";
@@ -61,9 +59,9 @@ const PICKUPS = {
     $: {
         name: "Money",
         effect: (playerStats) => {
-            const amount = math.round(Math.random() * 7) + 3;
+            const amount = Math.round(Math.random() * 7) + 3;
             playerStats.cash += amount;
-            eventText = `Player Gained ${amount}$`;
+            return `Player Gained ${amount}$`;
         }
     }
 };
@@ -157,7 +155,7 @@ class Labyrinth {
                 lastDoor: currentDoor
             });
         }
-
+        
         this.levelID = levelID;
         this.level = readMapFile(levels[levelID]);
 
@@ -169,7 +167,7 @@ class Labyrinth {
                         row,
                         col,
                         direction: 1,
-                        strength: Math.floor(Math.random() * 5) +1,
+                        strength: Math.floor(Math.random() * 5) + 1,
                         hitpoints: Math.floor(Math.random() * 10) + 5
                     });
                 }
@@ -227,7 +225,7 @@ class Labyrinth {
     findSecondTeleport(currentRow, currentCol) {
         for (let row = 0; row < this.level.length; row++) {
             for (let col = 0; col < this.level[row].length; col++) {
-                if (this.level[row][col] = "♨︎" &&(row !== currentRow || currentCol)) {
+                if (this.level[row][col] === "\u2668" &&(row !== currentRow || currentCol)) {
                     return { row, col};
                 }
             }
@@ -274,12 +272,13 @@ class Labyrinth {
 
         const targetCell = this.level[tRow][tCol];
 
-        if (THINGS.include(targetCell)) { // Is there anything where Hero is moving to
+        if (THINGS.includes(targetCell)) { // Is there anything where Hero is moving to
             if (PICKUPS[targetCell]) {
                 const message = PICKUPS[targetCell].effect(playerStats);
                 this.addCombatLog(message);
             }
 
+            // Move the HERO
             if (this.level[playerPos.row][playerPos.col] === HERO && this.lastDoorSymbol) {
                 this.level[playerPos.row][playerPos.col] = this.lastDoorSymbol;
                 this.lastDoorSymbol = null;
@@ -287,7 +286,6 @@ class Labyrinth {
                 this.level[playerPos.row][playerPos.col] = EMPTY;
             }
            
-            // Move the HERO
             this.level[tRow][tCol] = HERO;
 
             // Update the HERO
@@ -301,7 +299,7 @@ class Labyrinth {
             if (npc) {
                 this.handleBattle(npc)
             }
-        } else if (targetCell == "D" || targetCell === "d") {
+        } else if (targetCell === "D" || targetCell === "d") {
             this.lastDoorSymbol = targetCell;
             const currentRoom = this.levelID;
             const doorMapping = DOOR_MAPPINGS[currentRoom][targetCell];
@@ -309,6 +307,16 @@ class Labyrinth {
             if (doorMapping) {
                 this.lastDoorSymbol = targetCell;
                 this.loadLevel(doorMapping.targetRoom, doorMapping.targetDoor);
+                isDirty = true;
+            }
+        } else if (targetCell === "\u2668") {
+            const otherTeleport = this.findSecondTeleport(tRow, tCol);
+            if (otherTeleport) {
+                this.level[playerPos.row][playerPos.col] = "\u2668";
+                playerPos.row = otherTeleport.row;
+                playerPos.col = otherTeleport.col;
+                this.level[playerPos.row][playerPos.col] = HERO;
+                eventText = "Teleported!";
                 isDirty = true;
             }
         }
@@ -355,7 +363,7 @@ class Labyrinth {
 
         for (let row = 0; row < this.level.length; row++) {
             let rowRendering = "";
-            for (let col = 0; col < level[row].length; col++) {
+            for (let col = 0; col < this.level[row].length; col++) {
                 let symbol = this.level[row][col];
                 if (pallet[symbol] != undefined) {
                     rowRendering += pallet[symbol] + symbol + ANSI.COLOR_RESET;

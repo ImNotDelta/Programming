@@ -19,7 +19,7 @@ const outputGraphics = `
 class SplashScreen {
 
     constructor() {
-        this.dirty = true;
+        this.isDirty = true;
     }
 
     animate(onComplete) {
