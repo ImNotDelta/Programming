@@ -102,6 +102,7 @@ class Labyrinth {
         this.level = [];
         this.levelID = null;
         this.loadLevel(startingLevel);
+        this.teleportPairs = {};
     }
     addCombatLog(message) {
         this.combatLog.push(message);
@@ -222,15 +223,27 @@ class Labyrinth {
         isDirty = true;
     }
 
-    findSecondTeleport(currentRow, currentCol) {
-        for (let row = 0; row < this.level.length; row++) {
-            for (let col = 0; col < this.level[row].length; col++) {
-                if (this.level[row][col] === "\u2668" &&(row !== currentRow || currentCol)) {
-                    return { row, col};
-                }
+    handleTeleport(currentRow, currentCol) {
+        const key = `${currentRow},${currentCol}`;
+        const target = this.teleportPairs[key];
+
+        if (target) {
+            this.level[currentRow][currentCol] = `\u2668`;
+            this.level[playerPos.row][playerPos.col] = EMPTY;
+
+            if (this.level[playerPos.row][playerPos.col] = HERO) {
+                this.level[playerPos.row][playerPos.col] = EMPTY;
+            } else if (this.level[playerPos.row][playerPos.col] = HERO_ON_TELEPORTER){
+                this.level[playerPos.row][playerPos.col] = `\u2668`;
             }
+
+            playerPos.row = target.row;
+            playerPos.col = target.col;
+
+            this.level[playerPos.row][playerPos.col] = HERO_ON_TELEPORTER;
+
+            isDirty = true;
         }
-        return null;
     }
 
     update() {
@@ -310,16 +323,9 @@ class Labyrinth {
                 isDirty = true;
             }
         } else if (targetCell === "\u2668") {
-            const otherTeleport = this.findSecondTeleport(tRow, tCol);
-            if (otherTeleport) {
-                this.level[playerPos.row][playerPos.col] = "\u2668";
-                playerPos.row = otherTeleport.row;
-                playerPos.col = otherTeleport.col;
-                this.level[playerPos.row][playerPos.col] = HERO;
-                eventText = "Teleported!";
-                isDirty = true;
+            this.handleTeleport(tRow, tCol);
             }
-        }
+            
         this.npcs.forEach((npc) => {
             if (npc.type === "B") {
                 const heroDistance = Math.abs(npc.row - playerPos.row) + Math.abs(npc.col - playerPos.col);
